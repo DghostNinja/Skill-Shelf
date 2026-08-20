@@ -709,6 +709,18 @@ a.tag.related:hover {
   text-decoration: none;
 }
 
+.breadcrumbs .crumb-sep {
+  margin: 0 8px;
+  color: var(--muted);
+}
+
+.skill-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 .skill-head {
   padding: 28px 0 24px;
   border-bottom: 1px solid var(--border);

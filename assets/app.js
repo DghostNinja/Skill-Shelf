@@ -841,8 +841,13 @@
     }
 
     var bread = el("div", "breadcrumbs");
+    var topic = skill.topic || skill.category || "General";
     bread.innerHTML =
-      '<a href="#/"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg> All skills</a>';
+      '<a href="#/"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg> All skills</a>' +
+      '<span class="crumb-sep">/</span>' +
+      '<a href="#/?c=' + encodeURIComponent(topic) + '">' +
+      escapeHtml(topic) +
+      "</a>";
     app.appendChild(bread);
 
     var head = el("header", "skill-head");
@@ -896,6 +901,34 @@
       actions.appendChild(srcBtn);
     }
     head.appendChild(actions);
+
+    // Prev / next navigation within the same folder.
+    var siblings = state.skills
+      .filter(function (s) {
+        return (s.topic || s.category || "General") === topic;
+      })
+      .slice()
+      .sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+    var idx = -1;
+    siblings.forEach(function (s, i) {
+      if (s.slug === skill.slug) idx = i;
+    });
+    if (siblings.length > 1 && idx !== -1) {
+      var nav = el("div", "skill-nav");
+      if (idx > 0) {
+        var prev = el("a", "btn btn-ghost", "← " + siblings[idx - 1].name);
+        prev.href = "#/skills/" + siblings[idx - 1].slug;
+        nav.appendChild(prev);
+      }
+      if (idx < siblings.length - 1) {
+        var next = el("a", "btn btn-ghost", siblings[idx + 1].name + " →");
+        next.href = "#/skills/" + siblings[idx + 1].slug;
+        nav.appendChild(next);
+      }
+      app.appendChild(nav);
+    }
 
     var snippet =
       "Skill: " + skill.name +
