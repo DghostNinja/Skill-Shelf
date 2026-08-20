@@ -1,0 +1,31 @@
+name: Generate skill registry
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Regenerate index.json from skills/
+        run: python3 .github/scripts/generate_index.py
+
+      - name: Commit regenerated index.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: regenerate index.json from skills"
+            git push
+          else
+            echo "index.json unchanged — nothing to commit"
+          fi

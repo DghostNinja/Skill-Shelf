@@ -1,0 +1,61 @@
+{
+  "$comment": "Auto-generated from skills/*/skill.md by .github/scripts/generate_index.py. Do not edit manually.",
+  "skills": [
+    {
+      "name": "Android Pentesting",
+      "slug": "android-pentesting",
+      "description": "End-to-end methodology for Android security research.",
+      "category": "Security",
+      "path": "skills/android-pentesting/skill.md",
+      "version": "1.0.0",
+      "tags": [
+        "android",
+        "mobile",
+        "pentest",
+        "reverse-engineering"
+      ]
+    },
+    {
+      "name": "Application Security Review",
+      "slug": "appsec",
+      "description": "Structured review of web applications for security flaws.",
+      "category": "Security",
+      "path": "skills/appsec/skill.md",
+      "version": "1.1.0",
+      "tags": [
+        "appsec",
+        "owasp",
+        "review",
+        "web"
+      ]
+    },
+    {
+      "name": "Git Release Workflow",
+      "slug": "git-release-workflow",
+      "description": "Dependable release process for git projects.",
+      "category": "Workflow",
+      "path": "skills/git-release-workflow/skill.md",
+      "version": "1.0.0",
+      "tags": [
+        "git",
+        "release",
+        "ci",
+        "automation"
+      ]
+    },
+    {
+      "name": "Web Application Pentesting",
+      "slug": "web-pentesting",
+      "description": "Hands-on web pentesting workflow with evidence capture.",
+      "category": "Security",
+      "path": "skills/web-pentesting/skill.md",
+      "version": "1.0.0",
+      "tags": [
+        "web",
+        "pentest",
+        "owasp",
+        "burp"
+      ]
+    }
+  ]
+}
