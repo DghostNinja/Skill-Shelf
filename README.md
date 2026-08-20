@@ -9,8 +9,11 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 - **Agent-friendly** — `/index.json` is the registry; `/skills/<slug>/skill.md` is the content. Both are plain files served as-is.
 - **Zero dependencies** — plain HTML, CSS, and vanilla JavaScript. The Markdown renderer is hand-written and bundled.
 - **Subpath safe** — works at `/` *and* under a GitHub Pages subpath like `/Skill-Shelf/`.
-- **Search & filter** — live search across name, description, category, and tags, plus category chips.
-- **Copy-first UX** — copy the direct skill URL or the raw `.md` link in one click.
+- **Search & filter** — live search across name, description, category, and tags, plus category chips. Searches are shareable via the URL (`#/?q=...&c=...`).
+- **Copy-first UX** — copy the direct skill URL, the raw `.md` link, or a ready-to-paste **agent snippet** in one click.
+- **Auto table of contents** — generated from each skill's headings (only on longer skills).
+- **Related skills** — optional `related` field links skills to each other.
+- **Sorting** — A–Z or Newest (uses an optional `date` in front matter).
 - **Dark / light mode** — follows system preference, toggle persisted in `localStorage`.
 - **Responsive** — clean card grid that adapts to mobile.
 
@@ -20,6 +23,7 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 /
 ├── index.html          # SPA shell (list + detail views, hash-routed)
 ├── index.json          # Skill registry (auto-generated, not edited by hand)
+├── llms.txt            # Agent-readable index (auto-generated)
 ├── assets/
 │   ├── style.css       # All styling, dark/light themes
 │   └── app.js          # Registry load, search, routing, markdown renderer
@@ -31,7 +35,7 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 │   └── ...
 ├── .github/
 │   ├── workflows/
-│   │   └── generate-index.yml   # Rebuilds index.json on every push
+│   │   └── generate-index.yml   # Rebuilds index.json + llms.txt on every push
 │   └── scripts/
 │       └── generate_index.py    # Scans skills/ + front matter → index.json
 └── README.md
@@ -39,19 +43,106 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 
 ## How it works
 
-The site is a single static page. The frontend fetches `index.json`, renders skill cards, and on click loads the matching `skills/<slug>/skill.md` and renders it with a bundled Markdown renderer (including code blocks with copy buttons). On every push, a GitHub Action scans `skills/` and regenerates `index.json` from each file's front matter, so adding a skill is just adding a folder and a file.
+The site is a single static page. The frontend fetches `index.json`, renders skill cards, and on click loads the matching `skills/<slug>/skill.md` and renders it with a bundled Markdown renderer (including code blocks with copy buttons). On every push, a GitHub Action scans `skills/` and regenerates `index.json` and `llms.txt` from each file's front matter, so adding a skill is just adding a folder and a file.
+
+> **Note:** all example URLs below use `https://dghostninja.github.io/Skill-Shelf/`. If you self-host or run this locally, replace that base with your own URL (e.g. `http://localhost:8080/Skill-Shelf/`).
 
 Because everything is a plain file, an AI agent can bypass the UI entirely:
 
 ```bash
 # 1. Discover available skills
-curl https://USERNAME.github.io/REPOSITORY/index.json
+curl https://dghostninja.github.io/Skill-Shelf/index.json
 
-# 2. Fetch a skill's content directly
-curl https://USERNAME.github.io/REPOSITORY/skills/android-pentesting/skill.md
+# 2. Human/agent-readable index (same info, prose format)
+curl https://dghostninja.github.io/Skill-Shelf/llms.txt
+
+# 3. Fetch a skill's content directly
+curl https://dghostninja.github.io/Skill-Shelf/skills/android-pentesting/skill.md
 ```
 
 The raw `.md` URL is always reachable independently of the website — GitHub Pages serves it as a plain text file.
+
+## Usage with a model or agent
+
+Every skill is a plain text file. There is no login, no app, no plugin to install. You only need a public URL.
+
+> The same instructions are available on the site itself at `#/usage` (or via the **Usage** link in the header).
+
+### Step 1: Give the model the registry
+
+Open a chat with any model that can fetch URLs (ChatGPT, Claude, Gemini, a coding agent, etc.) and paste one of these:
+
+```text
+https://dghostninja.github.io/Skill-Shelf/index.json
+```
+
+or the readable version:
+
+```text
+https://dghostninja.github.io/Skill-Shelf/llms.txt
+```
+
+The model reads the list, sees the skill names, descriptions, and categories, and can pick one.
+
+### Step 2: Point it at a specific skill
+
+The raw file URL for any skill is:
+
+```text
+https://dghostninja.github.io/Skill-Shelf/skills/<skill-name>/skill.md
+```
+
+For example:
+
+```text
+https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+```
+
+### Step 3: Copy the agent snippet (easiest way)
+
+Open any skill on the website. Near the top there is a box labelled **For AI agents** with a **Copy agent snippet** button. It copies a short block like this:
+
+```text
+Skill: Application Security Review
+Category: Security
+Description: Structured review of web applications for security flaws.
+
+Fetch the skill file:
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+```
+
+Paste that block into your model's prompt. It tells the model what the skill is and how to get the full instructions.
+
+### What a ready-to-use prompt looks like
+
+```text
+Use this skill for the task.
+
+Skill: Application Security Review
+Category: Security
+Description: Structured review of web applications for security flaws.
+
+Fetch the skill file:
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+
+Follow the skill's steps and report your findings.
+```
+
+### If the model cannot fetch URLs
+
+Download the raw `.md` file (right-click the Raw .md file button, save), then attach the file directly to the chat like any document.
+
+### Command-line check
+
+```bash
+# See what skills exist
+curl https://dghostninja.github.io/Skill-Shelf/index.json
+
+# Get one skill's full instructions
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+```
+
+That is the whole flow: registry for discovery, raw file for content. Both stay plain files, so any tool that can read a URL can use them.
 
 ## Adding a new skill
 
@@ -96,6 +187,8 @@ Only `name` and the `skill.md` file itself are strictly required. If you omit th
 | `category` | no | Drives the filter chips; defaults to `General` |
 | `version` | no | Optional version string (kept in the registry metadata) |
 | `tags` | no | Array of strings; searched and rendered as small chips |
+| `date` | no | ISO date (`2026-08-01`); powers the "Newest" sort |
+| `related` | no | Array of other skill slugs (`[appsec, web-pentesting]`); rendered as links on the detail page |
 
 > **Important:** keep the folder name and `slug` matching — the site resolves both against the repo's base URL so it works under any GitHub Pages subpath.
 
@@ -111,12 +204,14 @@ Only `name` and the `skill.md` file itself are strictly required. If you omit th
 4. Click **Save**. GitHub publishes at:
 
    ```text
-   https://USERNAME.github.io/REPOSITORY/
+   https://dghostninja.github.io/Skill-Shelf/
    ```
 
    If the repo is named `<username>.github.io` the site is served at the domain root.
 
 The site auto-detects its base path from the script location, so no configuration is needed for the subpath case.
+
+> **Custom domain?** `llms.txt` and the registry URLs are derived automatically from the repo name. If you use a custom domain, set a repository variable named `SITE_URL` (e.g. `https://skills.example.com/`) in **Settings → Secrets and variables → Actions → Variables** and `llms.txt` will link to that instead.
 
 ## Local development
 

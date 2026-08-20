@@ -13,6 +13,11 @@
         "mobile",
         "pentest",
         "reverse-engineering"
+      ],
+      "date": "2026-08-01",
+      "related": [
+        "web-pentesting",
+        "appsec"
       ]
     },
     {
@@ -27,6 +32,11 @@
         "owasp",
         "review",
         "web"
+      ],
+      "date": "2026-07-18",
+      "related": [
+        "web-pentesting",
+        "android-pentesting"
       ]
     },
     {
@@ -41,7 +51,8 @@
         "release",
         "ci",
         "automation"
-      ]
+      ],
+      "date": "2026-05-30"
     },
     {
       "name": "Web Application Pentesting",
@@ -55,6 +66,11 @@
         "pentest",
         "owasp",
         "burp"
+      ],
+      "date": "2026-06-25",
+      "related": [
+        "appsec",
+        "android-pentesting"
       ]
     }
   ]

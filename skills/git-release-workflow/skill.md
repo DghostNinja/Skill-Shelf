@@ -4,6 +4,7 @@ slug: git-release-workflow
 description: Dependable release process for git projects.
 category: Workflow
 version: 1.0.0
+date: 2026-05-30
 tags: [git, release, ci, automation]
 ---
 

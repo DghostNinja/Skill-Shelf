@@ -330,6 +330,117 @@ main {
   font-weight: 500;
 }
 
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: -6px 0 26px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stats-dot {
+  color: var(--border-strong);
+}
+
+.meta-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-select {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.sort-select:hover {
+  border-color: var(--border-strong);
+}
+
+.sort-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+/* Related skills chips */
+.related-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+a.tag.related {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+a.tag.related:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Table of contents */
+.toc {
+  margin: 0 0 28px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.toc-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc li {
+  margin: 2px 0;
+}
+
+.toc-h3 {
+  padding-left: 16px;
+}
+
+.toc-link {
+  background: none;
+  border: none;
+  padding: 3px 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--accent);
+  text-align: left;
+  cursor: pointer;
+}
+
+.toc-link:hover {
+  text-decoration: underline;
+  color: var(--accent-strong);
+}
+
 /* --------------------------------------------------------------------------
    Skill grid + cards
    -------------------------------------------------------------------------- */

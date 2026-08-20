@@ -175,6 +175,20 @@
       });
   }
 
+  // Unique, stable ids for headings so an auto table of contents can link to
+  // them. Shared across recursive markdownToHtml calls (blockquotes).
+  var _headingIds = {};
+
+  function slugifyHeading(text) {
+    var base =
+      String(text)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "section";
+    var n = (_headingIds[base] = (_headingIds[base] || 0) + 1);
+    return n === 1 ? base : base + "-" + n;
+  }
+
   var BLOCK_RE = /^(#{1,6}\s|\s*([-*_]\s*){3,}$|\s*>\s?|\s*[-+*]\s+|\s*\d+[.)]\s+)/;
 
   function markdownToHtml(src) {
@@ -214,7 +228,17 @@
       var heading = line.match(/^(#{1,6})\s+(.*)$/);
       if (heading) {
         var lvl = heading[1].length;
-        out.push("<h" + lvl + ">" + inline(heading[2]) + "</h" + lvl + ">");
+        out.push(
+          "<h" +
+            lvl +
+            ' id="' +
+            slugifyHeading(heading[2]) +
+            '">' +
+            inline(heading[2]) +
+            "</h" +
+            lvl +
+            ">"
+        );
         i++;
         continue;
       }
@@ -352,6 +376,7 @@
     skills: [],
     query: "",
     category: "All",
+    sort: "az",
     loaded: false,
   };
 
@@ -383,7 +408,38 @@
     var hash = location.hash || "#/";
     var m = hash.match(/^#\/skills\/([^/?#]+)/);
     if (m) return { view: "skill", slug: decodeURIComponent(m[1]) };
+    if (/^#\/usage/.test(hash)) return { view: "usage" };
     return { view: "list" };
+  }
+
+  // Parse "#/?q=...&c=..." into { q, c } so searches are shareable.
+  function parseListHash(hash) {
+    var h = String(hash || "").replace(/^#\/?/, "");
+    var params = {};
+    String(h)
+      .replace(/^\?/, "")
+      .split("&")
+      .forEach(function (pair) {
+        if (!pair) return;
+        var eq = pair.indexOf("=");
+        var k = eq === -1 ? pair : pair.slice(0, eq);
+        var v = eq === -1 ? "" : pair.slice(eq + 1);
+        try {
+          params[decodeURIComponent(k)] = decodeURIComponent(v);
+        } catch (e) {
+          params[k] = v;
+        }
+      });
+    return { q: params.q || "", c: params.c || "All" };
+  }
+
+  // Build the shareable hash for the current list state.
+  function listHash() {
+    var parts = [];
+    if (state.query) parts.push("q=" + encodeURIComponent(state.query));
+    if (state.category && state.category !== "All")
+      parts.push("c=" + encodeURIComponent(state.category));
+    return parts.length ? "#/?" + parts.join("&") : "#/";
   }
 
   function router() {
@@ -391,7 +447,12 @@
     window.scrollTo({ top: 0, behavior: "auto" });
     if (route.view === "skill") {
       renderSkill(route.slug);
+    } else if (route.view === "usage") {
+      renderUsage();
     } else {
+      var params = parseListHash(location.hash);
+      state.query = params.q;
+      state.category = params.c;
       renderList();
     }
   }
@@ -404,7 +465,7 @@
 
   function filteredSkills() {
     var q = state.query.trim().toLowerCase();
-    return state.skills.filter(function (s) {
+    var list = state.skills.filter(function (s) {
       var inCategory =
         state.category === "All" || s.category === state.category;
       if (!inCategory) return false;
@@ -420,6 +481,23 @@
         .toLowerCase();
       return haystack.indexOf(q) !== -1;
     });
+
+    if (state.sort === "newest") {
+      list.sort(function (a, b) {
+        var da = a.date || "";
+        var db = b.date || "";
+        if (!da && !db) return a.name.localeCompare(b.name);
+        if (!da) return 1;
+        if (!db) return -1;
+        if (da === db) return a.name.localeCompare(b.name);
+        return db.localeCompare(da);
+      });
+    } else {
+      list.sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+    }
+    return list;
   }
 
   function buildCard(s) {
@@ -497,6 +575,7 @@
     input.addEventListener("input", function () {
       state.query = input.value;
       renderResults();
+      history.replaceState(null, "", listHash());
     });
     searchWrap.appendChild(input);
     toolbar.appendChild(searchWrap);
@@ -510,12 +589,28 @@
       chip.addEventListener("click", function () {
         state.category = c;
         renderResults();
+        history.replaceState(null, "", listHash());
       });
       chips.appendChild(chip);
     });
     toolbar.appendChild(chips);
 
     app.appendChild(toolbar);
+
+    var stats = el("div", "stats");
+    stats.innerHTML =
+      "<span>" +
+      state.skills.length +
+      " skill" +
+      (state.skills.length === 1 ? "" : "s") +
+      "</span>" +
+      "<span class=\"stats-dot\">·</span>" +
+      "<span>" +
+      getCategories().length +
+      " categor" +
+      (getCategories().length === 1 ? "y" : "ies") +
+      "</span>";
+    app.appendChild(stats);
 
     var results = el("div");
     results.id = "results";
@@ -531,10 +626,26 @@
     var skills = filteredSkills();
     var meta = el("div", "results-meta");
     var count = el("p", null, skills.length + " skill" + (skills.length === 1 ? "" : "s"));
+    meta.appendChild(count);
+
+    var right = el("div", "meta-right");
+    var sortSel = el("select", "sort-select");
+    sortSel.id = "sort-select";
+    sortSel.setAttribute("aria-label", "Sort skills");
+    sortSel.innerHTML =
+      '<option value="az">A–Z</option><option value="newest">Newest</option>';
+    sortSel.value = state.sort;
+    sortSel.addEventListener("change", function () {
+      state.sort = sortSel.value;
+      renderResults();
+    });
+    right.appendChild(sortSel);
+
     var regLink = el("a", null, "Discover via index.json →");
     regLink.href = resolve("index.json");
-    meta.appendChild(count);
-    meta.appendChild(regLink);
+    right.appendChild(regLink);
+
+    meta.appendChild(right);
 
     results.innerHTML = "";
     results.appendChild(meta);
@@ -560,6 +671,76 @@
       grid.appendChild(buildCard(s));
     });
     results.appendChild(grid);
+  }
+
+  /* ------------------------------------------------------------------------
+   * Usage view
+   * ---------------------------------------------------------------------- */
+
+  function renderUsage() {
+    app.innerHTML = "";
+
+    var registryUrl = resolve("index.json");
+    var llmsUrl = resolve("llms.txt");
+    var example = findSkill("appsec") || state.skills[0];
+    var exampleUrl = example ? absoluteUrl(example.path) : BASE + "skills/<skill-name>/skill.md";
+
+    var bread = el("div", "breadcrumbs");
+    bread.innerHTML =
+      '<a href="#/"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg> All skills</a>';
+    app.appendChild(bread);
+
+    var head = el("div", "skill-head");
+    head.appendChild(el("h1", "skill-title", "Usage"));
+    head.appendChild(
+      el(
+        "p",
+        "skill-desc",
+        "How to use these skills with a model or agent. Every skill is a plain text file, so no login or app is needed."
+      )
+    );
+    app.appendChild(head);
+
+    var article = el("article", "md");
+    article.id = "usage-md";
+    app.appendChild(article);
+
+    article.innerHTML =
+      "<h2>Step 1: give the model the registry</h2>" +
+      "<p>Open a chat with any model that can fetch URLs (ChatGPT, Claude, Gemini, a coding agent, etc.) and paste one of these:</p>" +
+      codeblock("text", registryUrl) +
+      "<p>or the readable version:</p>" +
+      codeblock("text", llmsUrl) +
+      "<p>The model reads the list, sees the names and descriptions, and can pick a skill.</p>" +
+      "<h2>Step 2: point it at a specific skill</h2>" +
+      "<p>The raw file URL for any skill follows this pattern:</p>" +
+      codeblock("text", BASE + "skills/<skill-name>/skill.md") +
+      "<p>For example:</p>" +
+      codeblock("text", exampleUrl) +
+      "<h2>Step 3: copy the agent snippet</h2>" +
+      "<p>Open any skill on this site. Near the top there is a box labelled <strong>For AI agents</strong> with a <strong>Copy agent snippet</strong> button. It copies a short block with the skill name, category, description, and the fetch command.</p>" +
+      "<p>Paste that block into your model's prompt.</p>" +
+      "<h2>What a ready-to-use prompt looks like</h2>" +
+      codeblock(
+        "text",
+        "Use this skill for the task.\n\n" +
+          "Skill: " +
+          (example ? example.name : "Skill Name") +
+          "\nCategory: " +
+          (example ? example.category : "General") +
+          "\nDescription: " +
+          (example ? example.description : "Short description.") +
+          "\n\nFetch the skill file:\ncurl " +
+          exampleUrl +
+          "\n\nFollow the skill's steps and report your findings."
+      ) +
+      "<h2>If the model cannot fetch URLs</h2>" +
+      "<p>Download the raw .md file using the <strong>Raw .md file</strong> button on the skill page, then attach the file directly to the chat like any document.</p>" +
+      "<h2>Command-line check</h2>" +
+      codeblock("bash", "curl " + registryUrl + "\ncurl " + exampleUrl);
+
+    document.title = "Usage · Skill Shelf";
+    attachCodeCopy(article);
   }
 
   /* ------------------------------------------------------------------------
@@ -597,6 +778,23 @@
         meta.appendChild(el("span", "tag", t));
       });
     }
+    if (skill.related && skill.related.length) {
+      var relList = [];
+      skill.related.forEach(function (slug) {
+        var found = findSkill(slug);
+        if (found) {
+          var a = el("a", "tag related", found.name);
+          a.href = "#/skills/" + found.slug;
+          relList.push(a);
+        }
+      });
+      if (relList.length) {
+        meta.appendChild(el("span", "related-label", "Related:"));
+        relList.forEach(function (a) {
+          meta.appendChild(a);
+        });
+      }
+    }
     head.appendChild(meta);
 
     var rawUrl = absoluteUrl(skill.path);
@@ -618,14 +816,20 @@
     }
     head.appendChild(actions);
 
+    var snippet =
+      "Skill: " + skill.name +
+      (skill.category ? "\nCategory: " + skill.category : "") +
+      (skill.description ? "\nDescription: " + skill.description : "") +
+      "\n\nFetch the skill file:\ncurl " + rawUrl;
+
     var note = el("div", "agent-note");
     note.innerHTML =
       '<div class="agent-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>For AI agents</div>' +
-      '<div class="agent-url"><code>' +
+      '<div class="agent-url"><code>curl ' +
       escapeHtml(rawUrl) +
       '</code><button class="btn btn-ghost" type="button" data-copy="' +
-      escapeHtml(rawUrl) +
-      '">Copy</button></div>';
+      escapeHtml(snippet) +
+      '">Copy agent snippet</button></div>';
     head.appendChild(note);
 
     app.appendChild(head);
@@ -641,7 +845,10 @@
         return res.text();
       })
       .then(function (text) {
+        _headingIds = {};
         article.innerHTML = markdownToHtml(stripFrontMatter(text));
+        var toc = buildToc(article);
+        if (toc) article.insertAdjacentHTML("afterbegin", toc);
         document.title = skill.name + " · Skill Shelf";
         attachCodeCopy(article);
       })
@@ -665,11 +872,47 @@
     });
   }
 
+  // Build an in-page table of contents from the rendered headings. Uses
+  // buttons (not #hash links) so it never interferes with hash routing.
+  function buildToc(container) {
+    var heads = container.querySelectorAll("h2, h3");
+    if (heads.length < 3) return "";
+    var items = [];
+    heads.forEach(function (h) {
+      if (!h.id) return;
+      items.push(
+        '<li class="toc-' +
+          h.tagName.toLowerCase() +
+          '"><button type="button" class="toc-link" data-target="' +
+          escapeHtml(h.id) +
+          '">' +
+          escapeHtml(h.textContent) +
+          "</button></li>"
+      );
+    });
+    if (!items.length) return "";
+    return (
+      '<nav class="toc"><p class="toc-title">Contents</p><ul>' +
+      items.join("") +
+      "</ul></nav>"
+    );
+  }
+
   // Global delegation for "data-copy" buttons rendered after the fact.
   document.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-copy]");
     if (!btn) return;
     copyText(btn.getAttribute("data-copy"), "Copied to clipboard");
+  });
+
+  // TOC navigation (buttons, not hash links).
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".toc-link");
+    if (!t) return;
+    var target = document.getElementById(t.getAttribute("data-target"));
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 
   /* ------------------------------------------------------------------------

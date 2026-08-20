@@ -1,0 +1,14 @@
+# Skill Shelf
+
+> A lightweight, public registry of reusable AI agent skills. Each skill is a plain Markdown file (SKILL.md) that an AI agent can fetch directly.
+
+## Skills
+
+- [Android Pentesting](https://DghostNinja.github.io/Skill-Shelf/skills/android-pentesting/skill.md): End-to-end methodology for Android security research.
+- [Application Security Review](https://DghostNinja.github.io/Skill-Shelf/skills/appsec/skill.md): Structured review of web applications for security flaws.
+- [Git Release Workflow](https://DghostNinja.github.io/Skill-Shelf/skills/git-release-workflow/skill.md): Dependable release process for git projects.
+- [Web Application Pentesting](https://DghostNinja.github.io/Skill-Shelf/skills/web-pentesting/skill.md): Hands-on web pentesting workflow with evidence capture.
+
+## Machine-readable index
+
+- [Registry](https://DghostNinja.github.io/Skill-Shelf/index.json): Full metadata for every skill.

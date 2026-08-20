@@ -4,7 +4,9 @@ slug: appsec
 description: Structured review of web applications for security flaws.
 category: Security
 version: 1.1.0
+date: 2026-07-18
 tags: [appsec, owasp, review, web]
+related: [web-pentesting, android-pentesting]
 ---
 
 # Application Security Review
