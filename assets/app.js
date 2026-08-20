@@ -555,6 +555,45 @@
     return card;
   }
 
+  // One card per topic folder. Lists the skills inside it; clicking a skill
+  // or "Open folder" drills into that folder.
+  function buildFolderCard(topic, skills) {
+    var card = el("article", "card folder-card");
+
+    var top = el("div", "card-top");
+    var badge = el("span", "badge", topic);
+    top.appendChild(badge);
+    card.appendChild(top);
+
+    var h3 = el("h3");
+    var link = el("a", "folder-title", topic);
+    link.href = "#/?c=" + encodeURIComponent(topic);
+    h3.appendChild(link);
+    card.appendChild(h3);
+
+    var count = el("p", "folder-count", skills.length + (skills.length === 1 ? " skill" : " skills"));
+    card.appendChild(count);
+
+    var list = el("ul", "folder-list");
+    skills.forEach(function (s) {
+      var li = el("li");
+      var a = el("a", "folder-item", s.name);
+      a.href = "#/skills/" + s.slug;
+      a.title = s.description || "";
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+    card.appendChild(list);
+
+    var actions = el("div", "card-actions");
+    var openBtn = el("a", "btn btn-primary", "Open folder");
+    openBtn.href = "#/?c=" + encodeURIComponent(topic);
+    actions.appendChild(openBtn);
+    card.appendChild(actions);
+
+    return card;
+  }
+
   function renderList() {
     app.innerHTML = "";
 
@@ -611,8 +650,8 @@
       "<span class=\"stats-dot\">·</span>" +
       "<span>" +
       getCategories().length +
-      " categor" +
-      (getCategories().length === 1 ? "y" : "ies") +
+      " folder" +
+      (getCategories().length === 1 ? "" : "s") +
       "</span>";
     app.appendChild(stats);
 
@@ -675,26 +714,27 @@
       grid.appendChild(buildCard(s));
     });
 
-    var grouped = state.category === "All" && !state.query.trim();
-    if (grouped) {
+    // When browsing everything (no filter, no search), show one card per
+    // folder instead of one card per skill. Each folder card lists the
+    // skills inside it. Adding a new folder under skills/ automatically
+    // produces a new folder card here — no code changes needed.
+    var folderView =
+      state.category === "All" && !state.query.trim();
+    if (folderView) {
       var byTopic = {};
-      skills.forEach(function (s) {
+      state.skills.forEach(function (s) {
         var t = s.topic || s.category || "General";
         (byTopic[t] = byTopic[t] || []).push(s);
       });
       results.innerHTML = "";
       results.appendChild(meta);
-      var topics = Object.keys(byTopic).sort();
-      topics.forEach(function (t) {
-        var head = el("h3", "topic-head");
-        head.textContent = t;
-        results.appendChild(head);
-        var g = el("div", "grid");
-        byTopic[t].forEach(function (s) {
-          g.appendChild(buildCard(s));
+      var folderGrid = el("div", "grid");
+      Object.keys(byTopic)
+        .sort()
+        .forEach(function (t) {
+          folderGrid.appendChild(buildFolderCard(t, byTopic[t]));
         });
-        results.appendChild(g);
-      });
+      results.appendChild(folderGrid);
       return;
     }
 
