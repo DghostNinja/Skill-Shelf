@@ -580,11 +580,9 @@
 
       var a = el("a", "folder-item-name", s.name);
       a.href = "#/skills/" + s.slug;
+      a.title = s.description || "";
       li.appendChild(a);
 
-      if (s.description) {
-        li.appendChild(el("p", "folder-item-desc", s.description));
-      }
       if (s.tags && s.tags.length) {
         var tags = el("div", "tags");
         s.tags.forEach(function (t) {
