@@ -500,19 +500,35 @@ a.tag.related:hover {
 }
 
 .folder-item {
-  display: block;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 0.92rem;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .folder-item:hover {
   border-color: var(--border-strong);
   background: var(--surface-hover);
+}
+
+.folder-item-name {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.folder-item-name:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.folder-item-desc {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .card {
