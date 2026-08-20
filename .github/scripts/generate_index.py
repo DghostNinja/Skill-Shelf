@@ -65,6 +65,7 @@ def read_skill(topic, md):
         "slug": slug,
         "description": fm.get("description", ""),
         "category": fm.get("category", "General"),
+        "topic": topic,
         "path": os.path.relpath(md, ROOT).replace(os.sep, "/"),
     }
     if fm.get("version"):

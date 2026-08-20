@@ -451,6 +451,24 @@ a.tag.related:hover {
   gap: 18px;
 }
 
+.topic-head {
+  margin: 26px 0 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topic-head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .card {
   display: flex;
   flex-direction: column;

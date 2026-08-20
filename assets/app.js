@@ -395,7 +395,8 @@
   function getCategories() {
     var map = {};
     state.skills.forEach(function (s) {
-      if (s.category) map[s.category] = true;
+      var t = s.topic || s.category;
+      if (t) map[t] = true;
     });
     return Object.keys(map).sort();
   }
@@ -467,12 +468,15 @@
     var q = state.query.trim().toLowerCase();
     var list = state.skills.filter(function (s) {
       var inCategory =
-        state.category === "All" || s.category === state.category;
+        state.category === "All" ||
+        s.topic === state.category ||
+        s.category === state.category;
       if (!inCategory) return false;
       if (!q) return true;
       var haystack = [
         s.name,
         s.description,
+        s.topic,
         s.category,
         s.version,
         (s.tags || []).join(" "),
@@ -504,7 +508,7 @@
     var card = el("article", "card");
 
     var top = el("div", "card-top");
-    var badge = el("span", "badge", s.category || "General");
+    var badge = el("span", "badge", s.topic || s.category || "General");
     top.appendChild(badge);
     card.appendChild(top);
 
@@ -670,6 +674,30 @@
     skills.forEach(function (s) {
       grid.appendChild(buildCard(s));
     });
+
+    var grouped = state.category === "All" && !state.query.trim();
+    if (grouped) {
+      var byTopic = {};
+      skills.forEach(function (s) {
+        var t = s.topic || s.category || "General";
+        (byTopic[t] = byTopic[t] || []).push(s);
+      });
+      results.innerHTML = "";
+      results.appendChild(meta);
+      var topics = Object.keys(byTopic).sort();
+      topics.forEach(function (t) {
+        var head = el("h3", "topic-head");
+        head.textContent = t;
+        results.appendChild(head);
+        var g = el("div", "grid");
+        byTopic[t].forEach(function (s) {
+          g.appendChild(buildCard(s));
+        });
+        results.appendChild(g);
+      });
+      return;
+    }
+
     results.appendChild(grid);
   }
 
@@ -772,7 +800,10 @@
     head.appendChild(el("p", "skill-desc", skill.description || ""));
 
     var meta = el("div", "skill-meta");
-    meta.appendChild(el("span", "badge", skill.category || "General"));
+    meta.appendChild(el("span", "badge", skill.topic || skill.category || "General"));
+    if (skill.category && skill.category !== skill.topic) {
+      meta.appendChild(el("span", "tag", skill.category));
+    }
     if (skill.tags && skill.tags.length) {
       skill.tags.forEach(function (t) {
         meta.appendChild(el("span", "tag", t));
