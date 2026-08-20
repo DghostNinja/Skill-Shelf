@@ -6,7 +6,7 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 
 ## Features
 
-- **Agent-friendly** — `/index.json` is the registry; `/skills/<slug>/skill.md` is the content. Both are plain files served as-is.
+- **Agent-friendly** — `/index.json` is the registry; `/skills/<topic>/<skill>.md` is the content. Both are plain files served as-is.
 - **Zero dependencies** — plain HTML, CSS, and vanilla JavaScript. The Markdown renderer is hand-written and bundled.
 - **Subpath safe** — works at `/` *and* under a GitHub Pages subpath like `/Skill-Shelf/`.
 - **Search & filter** — live search across name, description, category, and tags, plus category chips. Searches are shareable via the URL (`#/?q=...&c=...`).
@@ -28,11 +28,12 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 │   ├── style.css       # All styling, dark/light themes
 │   └── app.js          # Registry load, search, routing, markdown renderer
 ├── skills/
-│   ├── android-pentesting/
-│   │   └── skill.md
-│   ├── appsec/
-│   │   └── skill.md
-│   └── ...
+│   ├── web/                  # web-pentesting.md, api-security-testing.md, ...
+│   ├── appsec/               # appsec.md, secure-code-review.md, ...
+│   ├── mobile/               # android-pentesting.md, mobile-hacking.md, ...
+│   ├── hardware/             # hardware-hacking-arduino.md
+│   ├── workflow/             # git-release-workflow.md
+│   └── reporting/            # vulnerability-report-writer.md
 ├── .github/
 │   ├── workflows/
 │   │   └── generate-index.yml   # Rebuilds index.json + llms.txt on every push
@@ -43,7 +44,7 @@ A **lightweight, public web library** for reusable AI agent skills. Each skill i
 
 ## How it works
 
-The site is a single static page. The frontend fetches `index.json`, renders skill cards, and on click loads the matching `skills/<slug>/skill.md` and renders it with a bundled Markdown renderer (including code blocks with copy buttons). On every push, a GitHub Action scans `skills/` and regenerates `index.json` and `llms.txt` from each file's front matter, so adding a skill is just adding a folder and a file.
+The site is a single static page. The frontend fetches `index.json`, renders skill cards, and on click loads the matching `skills/<topic>/<skill>.md` and renders it with a bundled Markdown renderer (including code blocks with copy buttons). On every push, a GitHub Action scans `skills/` and regenerates `index.json` and `llms.txt` from each file's front matter, so adding a skill is just adding a file into a topic folder.
 
 > **Note:** all example URLs below use `https://dghostninja.github.io/Skill-Shelf/`. If you self-host or run this locally, replace that base with your own URL (e.g. `http://localhost:8080/Skill-Shelf/`).
 
@@ -57,7 +58,7 @@ curl https://dghostninja.github.io/Skill-Shelf/index.json
 curl https://dghostninja.github.io/Skill-Shelf/llms.txt
 
 # 3. Fetch a skill's content directly
-curl https://dghostninja.github.io/Skill-Shelf/skills/android-pentesting/skill.md
+curl https://dghostninja.github.io/Skill-Shelf/skills/web/web-pentesting.md
 ```
 
 The raw `.md` URL is always reachable independently of the website — GitHub Pages serves it as a plain text file.
@@ -89,13 +90,13 @@ The model reads the list, sees the skill names, descriptions, and categories, an
 The raw file URL for any skill is:
 
 ```text
-https://dghostninja.github.io/Skill-Shelf/skills/<skill-name>/skill.md
+https://dghostninja.github.io/Skill-Shelf/skills/<topic>/<skill>.md
 ```
 
 For example:
 
 ```text
-https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+https://dghostninja.github.io/Skill-Shelf/skills/appsec/appsec.md
 ```
 
 ### Step 3: Copy the agent snippet (easiest way)
@@ -108,7 +109,7 @@ Category: Security
 Description: Structured review of web applications for security flaws.
 
 Fetch the skill file:
-curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/appsec.md
 ```
 
 Paste that block into your model's prompt. It tells the model what the skill is and how to get the full instructions.
@@ -123,7 +124,7 @@ Category: Security
 Description: Structured review of web applications for security flaws.
 
 Fetch the skill file:
-curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/appsec.md
 
 Follow the skill's steps and report your findings.
 ```
@@ -139,7 +140,7 @@ Download the raw `.md` file (right-click the Raw .md file button, save), then at
 curl https://dghostninja.github.io/Skill-Shelf/index.json
 
 # Get one skill's full instructions
-curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/skill.md
+curl https://dghostninja.github.io/Skill-Shelf/skills/appsec/appsec.md
 ```
 
 That is the whole flow: registry for discovery, raw file for content. Both stay plain files, so any tool that can read a URL can use them.
@@ -150,13 +151,18 @@ That is the whole flow: registry for discovery, raw file for content. Both stay 
 (`.github/workflows/generate-index.yml`) scans `skills/` on every push and
 regenerates `index.json` automatically.
 
-1. **Create a directory** under `skills/`:
+Skills are grouped into **topic folders** (`web/`, `appsec/`, `mobile/`, `hardware/`,
+`workflow/`, `reporting/`). A folder can hold several skills — one well-named Markdown
+file per skill — so you don't end up with a folder per skill.
+
+1. **Pick a topic folder** (or create a new one) under `skills/`:
 
    ```bash
-   mkdir -p skills/my-new-skill
+   # add to an existing topic, or create a new one:
+   mkdir -p skills/my-topic
    ```
 
-2. **Add `skill.md`** with a YAML front-matter block (recommended — it supplies the metadata shown on the site):
+2. **Add one Markdown file per skill** — name it after the skill (e.g. `skills/web/my-new-skill.md`) with a YAML front-matter block (recommended — it supplies the metadata shown on the site):
 
    ```markdown
    ---
@@ -175,14 +181,14 @@ regenerates `index.json` automatically.
 
 3. **Commit and push.** The Action regenerates `index.json`, and GitHub Pages publishes the update. The card, styling, search, and detail page all appear automatically.
 
-Only `name` and the `skill.md` file itself are strictly required. If you omit the front matter, the generator falls back to the folder name and a `General` category, so even a bare Markdown file still shows up.
+Only `name` is strictly required. If you omit the front matter, the generator falls back to the file name and a `General` category, so even a bare Markdown file still shows up.
 
 ### Front matter fields
 
 | Field | Required | Description |
 | ----- | -------- | ----------- |
 | `name` | yes | Display name shown on cards and the skill page |
-| `slug` | no | URL fragment (`#/skills/<slug>`); defaults to the folder name |
+| `slug` | no | URL fragment (`#/skills/<slug>`); defaults to the file name |
 | `description` | no | Short summary shown on cards and the skill page |
 | `category` | no | Drives the filter chips; defaults to `General` |
 | `version` | no | Optional version string (kept in the registry metadata) |
@@ -190,7 +196,7 @@ Only `name` and the `skill.md` file itself are strictly required. If you omit th
 | `date` | no | ISO date (`2026-08-01`); powers the "Newest" sort |
 | `related` | no | Array of other skill slugs (`[appsec, web-pentesting]`); rendered as links on the detail page |
 
-> **Important:** keep the folder name and `slug` matching — the site resolves both against the repo's base URL so it works under any GitHub Pages subpath.
+> **Important:** keep the file name and `slug` matching — the site resolves both against the repo's base URL so it works under any GitHub Pages subpath.
 
 > `index.json` is now **auto-generated** (`.github/scripts/generate_index.py`). Don't edit it by hand; your changes will be overwritten on the next push.
 
@@ -242,7 +248,7 @@ python3 -m http.server 8080
 
 ## Contributing
 
-1. Add a skill: create `skills/<name>/skill.md` (see [Adding a new skill](#adding-a-new-skill)).
+1. Add a skill: create `skills/<topic>/<skill>.md` (see [Adding a new skill](#adding-a-new-skill)).
 2. Commit and push. The Action regenerates `index.json` and the site updates automatically.
 3. You can regenerate locally at any time with `python3 .github/scripts/generate_index.py`.
 

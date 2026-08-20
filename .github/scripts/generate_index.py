@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Regenerate index.json and llms.txt from the skills/ directory.
 
-Scans skills/<slug>/skill.md, reads the YAML front matter block at the top
-of each file, and builds the registry. Run from anywhere in the repo; it
-locates the repo root relative to this script.
+Scans skills/<topic>/*.md (one Markdown file per skill, grouped into topic
+folders that can hold several skills), reads the YAML front matter block at
+the top of each file, and builds the registry. Run from anywhere in the
+repo; it locates the repo root relative to this script.
 
 Front matter keys supported:
   name, slug, description, category, version, tags, date, related
 
-Only "name" and a file named skill.md are strictly required; everything
-else falls back to a sensible default so adding a skill is still just
-"create a folder, drop a file, push".
+Only "name" is strictly required; everything else falls back to a sensible
+default so adding a skill is still just "drop a file into a topic folder,
+push".
 """
 
 import json
@@ -48,15 +49,15 @@ def parse_front_matter(text):
     return meta
 
 
-def read_skill(entry):
-    md = os.path.join(SKILLS_DIR, entry, "skill.md")
+def read_skill(topic, md):
     if not os.path.isfile(md):
         return None
     with open(md, encoding="utf-8") as f:
         text = f.read()
     fm = parse_front_matter(text)
 
-    slug = fm.get("slug") or entry
+    stem = os.path.splitext(os.path.basename(md))[0]
+    slug = fm.get("slug") or stem
     name = fm.get("name") or slug.replace("-", " ").title()
 
     item = {
@@ -64,7 +65,7 @@ def read_skill(entry):
         "slug": slug,
         "description": fm.get("description", ""),
         "category": fm.get("category", "General"),
-        "path": "skills/{}/skill.md".format(slug),
+        "path": os.path.relpath(md, ROOT).replace(os.sep, "/"),
     }
     if fm.get("version"):
         item["version"] = str(fm["version"])
@@ -98,13 +99,20 @@ def site_base():
 def build():
     skills = []
     if os.path.isdir(SKILLS_DIR):
-        for entry in sorted(os.listdir(SKILLS_DIR)):
-            item = read_skill(entry)
-            if item:
-                skills.append(item)
+        for topic in sorted(os.listdir(SKILLS_DIR)):
+            tdir = os.path.join(SKILLS_DIR, topic)
+            if not os.path.isdir(tdir) or topic.startswith("."):
+                continue
+            for entry in sorted(os.listdir(tdir)):
+                md = os.path.join(tdir, entry)
+                if not os.path.isfile(md) or not md.endswith(".md"):
+                    continue
+                item = read_skill(topic, md)
+                if item:
+                    skills.append(item)
 
     data = {
-        "$comment": "Auto-generated from skills/*/skill.md by .github/scripts/generate_index.py. Do not edit manually.",
+        "$comment": "Auto-generated from skills/<topic>/*.md by .github/scripts/generate_index.py. Do not edit manually.",
         "skills": skills,
     }
 

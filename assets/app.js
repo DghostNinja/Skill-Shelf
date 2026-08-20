@@ -32,7 +32,7 @@
 
   var BASE = getBase();
 
-  // Stored skill paths may be absolute ("/skills/x/skill.md") or relative.
+  // Stored skill paths may be absolute ("/skills/web/web-pentesting.md") or relative.
   // Normalize to a path relative to BASE so subpath deploys keep working.
   function resolve(path) {
     var clean = String(path || "").replace(/^\/+/, "");
@@ -683,7 +683,7 @@
     var registryUrl = resolve("index.json");
     var llmsUrl = resolve("llms.txt");
     var example = findSkill("appsec") || state.skills[0];
-    var exampleUrl = example ? absoluteUrl(example.path) : BASE + "skills/<skill-name>/skill.md";
+    var exampleUrl = example ? absoluteUrl(example.path) : BASE + "skills/<topic>/<skill-name>.md";
 
     var bread = el("div", "breadcrumbs");
     bread.innerHTML =
@@ -714,7 +714,7 @@
       "<p>The model reads the list, sees the names and descriptions, and can pick a skill.</p>" +
       "<h2>Step 2: point it at a specific skill</h2>" +
       "<p>The raw file URL for any skill follows this pattern:</p>" +
-      codeblock("text", BASE + "skills/<skill-name>/skill.md") +
+      codeblock("text", BASE + "skills/<topic>/<skill-name>.md") +
       "<p>For example:</p>" +
       codeblock("text", exampleUrl) +
       "<h2>Step 3: copy the agent snippet</h2>" +

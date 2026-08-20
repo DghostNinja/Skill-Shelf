@@ -1,31 +1,12 @@
 {
-  "$comment": "Auto-generated from skills/*/skill.md by .github/scripts/generate_index.py. Do not edit manually.",
+  "$comment": "Auto-generated from skills/<topic>/*.md by .github/scripts/generate_index.py. Do not edit manually.",
   "skills": [
-    {
-      "name": "Android Pentesting",
-      "slug": "android-pentesting",
-      "description": "End-to-end methodology for Android security research.",
-      "category": "Security",
-      "path": "skills/android-pentesting/skill.md",
-      "version": "1.0.0",
-      "tags": [
-        "android",
-        "mobile",
-        "pentest",
-        "reverse-engineering"
-      ],
-      "date": "2026-08-01",
-      "related": [
-        "web-pentesting",
-        "appsec"
-      ]
-    },
     {
       "name": "Application Security Review",
       "slug": "appsec",
       "description": "Structured review of web applications for security flaws.",
       "category": "Security",
-      "path": "skills/appsec/skill.md",
+      "path": "skills/appsec/appsec.md",
       "version": "1.1.0",
       "tags": [
         "appsec",
@@ -40,26 +21,214 @@
       ]
     },
     {
-      "name": "Git Release Workflow",
-      "slug": "git-release-workflow",
-      "description": "Dependable release process for git projects.",
-      "category": "Workflow",
-      "path": "skills/git-release-workflow/skill.md",
+      "name": "SAST & CI Security Scanning",
+      "slug": "sast-ci-scanning",
+      "description": "Build a CI security pipeline — Semgrep (incl. custom taint rules), Gitleaks, Trivy, and Checkov, with severity mapping and reports.",
+      "category": "Security",
+      "path": "skills/appsec/sast-ci-scanning.md",
       "version": "1.0.0",
       "tags": [
-        "git",
-        "release",
         "ci",
-        "automation"
+        "sast",
+        "semgrep",
+        "gitleaks",
+        "trivy",
+        "checkov",
+        "devsecops"
       ],
-      "date": "2026-05-30"
+      "date": "2026-08-20",
+      "related": [
+        "secure-code-review",
+        "bug-bounty-recon"
+      ]
+    },
+    {
+      "name": "Secure Code Review",
+      "slug": "secure-code-review",
+      "description": "Remediation-focused review patterns for Python web apps — SQLi, path traversal, RCE, XXE, and XSS with concrete fixes.",
+      "category": "Security",
+      "path": "skills/appsec/secure-code-review.md",
+      "version": "1.0.0",
+      "tags": [
+        "code-review",
+        "sast",
+        "remediation",
+        "python",
+        "owasp"
+      ],
+      "date": "2026-08-20",
+      "related": [
+        "sast-ci-scanning",
+        "web-pentesting",
+        "api-security-testing"
+      ]
+    },
+    {
+      "name": "Hardware Hacking with Arduino",
+      "slug": "hardware-hacking-arduino",
+      "description": "Getting started with Arduino and embedded hardware — pins, resistors, serial communication, and blink circuits.",
+      "category": "Hardware",
+      "path": "skills/hardware/hardware-hacking-arduino.md",
+      "version": "1.0.0",
+      "tags": [
+        "hardware",
+        "arduino",
+        "embedded",
+        "electronics",
+        "uart"
+      ],
+      "date": "2026-08-20"
+    },
+    {
+      "name": "Android Pentesting",
+      "slug": "android-pentesting",
+      "description": "End-to-end methodology for Android security research.",
+      "category": "Security",
+      "path": "skills/mobile/android-pentesting.md",
+      "version": "1.0.0",
+      "tags": [
+        "android",
+        "mobile",
+        "pentest",
+        "reverse-engineering"
+      ],
+      "date": "2026-08-01",
+      "related": [
+        "web-pentesting",
+        "appsec"
+      ]
+    },
+    {
+      "name": "Flutter Mobile Static Analysis",
+      "slug": "flutter-mobile-static-analysis",
+      "description": "Authorized, evidence-first static analysis of Flutter/Dart mobile apps using Blutter decompilation or a raw libapp.so.",
+      "category": "Security",
+      "path": "skills/mobile/flutter-mobile-static-analysis.md",
+      "version": "1.0.0",
+      "tags": [
+        "flutter",
+        "dart",
+        "mobile",
+        "static-analysis",
+        "reverse-engineering"
+      ],
+      "date": "2026-08-15",
+      "related": [
+        "mobile-hacking",
+        "android-pentesting"
+      ]
+    },
+    {
+      "name": "Mobile Hacking Reference (Android)",
+      "slug": "mobile-hacking",
+      "description": "Field-tested playbook for analyzing and attacking Android apps, from recon to reporting.",
+      "category": "Security",
+      "path": "skills/mobile/mobile-hacking.md",
+      "version": "1.0.0",
+      "tags": [
+        "android",
+        "mobile",
+        "reverse-engineering",
+        "pentest",
+        "frida"
+      ],
+      "date": "2026-08-18",
+      "related": [
+        "android-pentesting",
+        "flutter-mobile-static-analysis",
+        "vulnerability-report-writer"
+      ]
+    },
+    {
+      "name": "Vulnerability Report Writer",
+      "slug": "vulnerability-report-writer",
+      "description": "Turns a short vulnerability description into a professional, structured penetration testing finding.",
+      "category": "Reporting",
+      "path": "skills/reporting/vulnerability-report-writer.md",
+      "version": "1.0.0",
+      "tags": [
+        "reporting",
+        "pentest",
+        "finding",
+        "severity"
+      ],
+      "date": "2026-08-12",
+      "related": [
+        "web-pentesting",
+        "appsec"
+      ]
+    },
+    {
+      "name": "API Security Testing",
+      "slug": "api-security-testing",
+      "description": "Practical methodology for finding bugs in web APIs — docs discovery, parameter fuzzing, mass assignment, and server-side parameter pollution.",
+      "category": "Security",
+      "path": "skills/web/api-security-testing.md",
+      "version": "1.0.0",
+      "tags": [
+        "api",
+        "appsec",
+        "testing",
+        "rest",
+        "owasp"
+      ],
+      "date": "2026-08-20",
+      "related": [
+        "web-pentesting",
+        "web-exploitation-reference",
+        "secure-code-review"
+      ]
+    },
+    {
+      "name": "Bug Bounty Recon Playbook",
+      "slug": "bug-bounty-recon",
+      "description": "Automated recon workflow for bug bounty targets — subdomain discovery, live probing, and historic URL harvesting.",
+      "category": "Security",
+      "path": "skills/web/bug-bounty-recon.md",
+      "version": "1.0.0",
+      "tags": [
+        "recon",
+        "bug-bounty",
+        "subdomains",
+        "osint",
+        "enumeration"
+      ],
+      "date": "2026-08-20",
+      "related": [
+        "web-pentesting",
+        "api-security-testing",
+        "web-exploitation-reference"
+      ]
+    },
+    {
+      "name": "Web Exploitation Reference",
+      "slug": "web-exploitation-reference",
+      "description": "Quick-reference cheatsheets for web bugs — directory traversal payloads, reverse shells, and CORS exploitation patterns.",
+      "category": "Security",
+      "path": "skills/web/web-exploitation-reference.md",
+      "version": "1.0.0",
+      "tags": [
+        "web",
+        "exploitation",
+        "traversal",
+        "cors",
+        "reverse-shell",
+        "cheatsheet"
+      ],
+      "date": "2026-08-20",
+      "related": [
+        "web-pentesting",
+        "api-security-testing",
+        "bug-bounty-recon",
+        "secure-code-review"
+      ]
     },
     {
       "name": "Web Application Pentesting",
       "slug": "web-pentesting",
       "description": "Hands-on web pentesting workflow with evidence capture.",
       "category": "Security",
-      "path": "skills/web-pentesting/skill.md",
+      "path": "skills/web/web-pentesting.md",
       "version": "1.0.0",
       "tags": [
         "web",
@@ -72,6 +241,21 @@
         "appsec",
         "android-pentesting"
       ]
+    },
+    {
+      "name": "Git Release Workflow",
+      "slug": "git-release-workflow",
+      "description": "Dependable release process for git projects.",
+      "category": "Workflow",
+      "path": "skills/workflow/git-release-workflow.md",
+      "version": "1.0.0",
+      "tags": [
+        "git",
+        "release",
+        "ci",
+        "automation"
+      ],
+      "date": "2026-05-30"
     }
   ]
 }
