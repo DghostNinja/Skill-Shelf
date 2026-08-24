@@ -67,6 +67,24 @@
       ]
     },
     {
+      "name": "Windows Games in Bottles",
+      "slug": "windows-games-in-bottles",
+      "description": "Noob-proof process for installing and running old Windows games (retail discs/ISOs) in Flatpak Bottles on Linux, with a worked GTA San Andreas v1.0 example.",
+      "category": "Gaming",
+      "topic": "gaming",
+      "path": "skills/gaming/windows-games-in-bottles.md",
+      "version": "1.0.0",
+      "tags": [
+        "linux",
+        "bottles",
+        "wine",
+        "flatpak",
+        "gaming",
+        "iso"
+      ],
+      "date": "2026-08-24"
+    },
+    {
       "name": "Hardware Hacking with Arduino",
       "slug": "hardware-hacking-arduino",
       "description": "Getting started with Arduino and embedded hardware — pins, resistors, serial communication, and blink circuits.",

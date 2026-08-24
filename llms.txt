@@ -7,6 +7,7 @@
 - [Application Security Review](https://DghostNinja.github.io/Skill-Shelf/skills/appsec/appsec.md): Structured review of web applications for security flaws.
 - [SAST & CI Security Scanning](https://DghostNinja.github.io/Skill-Shelf/skills/appsec/sast-ci-scanning.md): Build a CI security pipeline — Semgrep (incl. custom taint rules), Gitleaks, Trivy, and Checkov, with severity mapping and reports.
 - [Secure Code Review](https://DghostNinja.github.io/Skill-Shelf/skills/appsec/secure-code-review.md): Remediation-focused review patterns for Python web apps — SQLi, path traversal, RCE, XXE, and XSS with concrete fixes.
+- [Windows Games in Bottles](https://DghostNinja.github.io/Skill-Shelf/skills/gaming/windows-games-in-bottles.md): Noob-proof process for installing and running old Windows games (retail discs/ISOs) in Flatpak Bottles on Linux, with a worked GTA San Andreas v1.0 example.
 - [Hardware Hacking with Arduino](https://DghostNinja.github.io/Skill-Shelf/skills/hardware/hardware-hacking-arduino.md): Getting started with Arduino and embedded hardware — pins, resistors, serial communication, and blink circuits.
 - [Android Pentesting](https://DghostNinja.github.io/Skill-Shelf/skills/mobile/android-pentesting.md): End-to-end methodology for Android security research.
 - [Flutter Mobile Static Analysis](https://DghostNinja.github.io/Skill-Shelf/skills/mobile/flutter-mobile-static-analysis.md): Authorized, evidence-first static analysis of Flutter/Dart mobile apps using Blutter decompilation or a raw libapp.so.
