@@ -3,7 +3,7 @@ name: Windows Games in Bottles
 slug: windows-games-in-bottles
 description: Noob-proof process for installing and running old Windows games (retail discs/ISOs) in Flatpak Bottles on Linux, with a worked GTA San Andreas v1.0 example.
 category: Gaming
-version: 1.0.0
+version: 1.1.0
 date: 2026-08-24
 tags: [linux, bottles, wine, flatpak, gaming, iso]
 ---
@@ -108,7 +108,45 @@ chmod +x game.exe
 
 Verify sizes before/after with `ls -la game*` — e.g. SA retail v1.0 US exe is 8,712,192 bytes vs the known patched unpacked exe at 14,383,616 bytes.
 
-## 6. Launch the Game
+## 6. Manual Install — When the Installer Chain Is Broken
+
+Some discs/repacks ship installer chains that cannot run under Wine (SafeDisc
+stub exes dying instantly with an empty log). If the disc's data files are
+**plain ZIP archives** (e.g. `0compressed.zip`, often alongside a `Crack/`
+folder), skip the installer entirely:
+
+**1. Confirm the payload is real zips:**
+```bash
+7z l /path/to/disc/0compressed.zip    # should list game files/folders
+```
+
+**2. Extract straight into the bottle:**
+```bash
+mkdir -p "<bottle>/drive_c/Games/<GAME>"
+cd "<bottle>/drive_c/Games/<GAME>"
+for z in /path/to/disc/*compressed.zip; do 7z x -y "$z" -bso0 -bsp0; done
+```
+
+**3. Fix the flat-extraction gotcha:** Windows-made zips extracted by 7z on
+Linux produce files with literal `\` in their names (`CARS\350Z\FILE.BIN`)
+instead of real folders. Restructure:
+```bash
+find . -name '*\\*' -print0 | while IFS= read -rd '' f; do
+  t="./$(printf '%s' "$f" | sed 's|^./||; s|\\|/|g')"
+  mkdir -p "$(dirname "$t")"; mv -f "$f" "$t"
+done
+```
+Verify: `find . -name '*\\*'` must print nothing and expected top-level folders
+must exist.
+
+**4. Copy the cracked executable** from the disc's `Crack/` folder over the
+game exe (backup pattern from section 5), then launch per section 7.
+
+Worked example: NFS Most Wanted 2005 retail ISO — installer stubs dead on
+arrival, but four `*compressed.zip` archives held the complete 2.9 GB game.
+Manual install took minutes.
+
+## 7. Launch the Game
 
 Same terminal pattern as installing, but target the installed exe and `cd` into the game folder first:
 
@@ -127,13 +165,14 @@ pkill -9 gta_sa.exe
 
 > **Footgun:** never use `pkill -f <partial string>` here — `-f` matches your own terminal command line and kills your shell session mid-command.
 
-## 7. Troubleshooting Cheatsheet
+## 8. Troubleshooting Cheatsheet
 
 | Symptom | Fix |
 |---|---|
 | Can't see files in Bottles picker | flatpak override (section 1A), restart Bottles fully |
 | "Launching..." then nothing | Terminal launch + read the log (sections 1B, 3) |
 | Silent hang, zero output | Wait 60+ sec; check `ps aux \| grep wine`; old InstallShield is slow |
+| Installer dies instantly, empty log | SafeDisc stubs can't run standalone — go manual install (section 6) |
 | Disc check dialog | Unfixable via config — patched exe or digital copy (section 1C) |
 | Where was it installed? | `drive_c/` inside the bottle folder (section 5) |
 | Black screen / glitches | SilentPatch + Widescreen Fix into the game folder |
@@ -156,8 +195,9 @@ Per-bottle config:  .../data/bottles/bottles/<NAME>/bottle.yml
 3. Create bottle with Gaming preset
 4. Install via the section 3 terminal command
 5. Skip bundled DirectX/redist prompts
-6. Launch via section 6 command, log to a file
-7. Only reach for exe patches if DRM or crashes block you
+6. Installer dies instantly? Check for plain-zip payload → section 6 manual install
+7. Launch via section 7 command, log to a file
+8. Only reach for exe patches if DRM or crashes block you
 
 ## Related
 
