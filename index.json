@@ -185,6 +185,27 @@
       ]
     },
     {
+      "name": "Slide Maker",
+      "slug": "slide-maker",
+      "description": "Makes human-readable, plain-tone slide decks as both an interactive HTML file and a matching 16:9 PPTX generated with python-pptx. Quizzes are interactive in the HTML and static (correct answer highlighted) in the PPTX. Presenter prep stays out of the deck.",
+      "category": "Slides",
+      "topic": "slides",
+      "path": "skills/slides/slide-maker.md",
+      "version": "1.0.0",
+      "tags": [
+        "slides",
+        "presentation",
+        "pptx",
+        "html",
+        "deck",
+        "training"
+      ],
+      "date": "2026-08-30",
+      "related": [
+        "workflow"
+      ]
+    },
+    {
       "name": "API Security Testing",
       "slug": "api-security-testing",
       "description": "Practical methodology for finding bugs in web APIs — docs discovery, parameter fuzzing, mass assignment, and server-side parameter pollution.",
